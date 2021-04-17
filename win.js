@@ -34,6 +34,7 @@ function Notify({title, message}){
         icon = path.join(__dirname,icon);
     if(!title)
         title = "Nachricht vom Server";
+    console.log("Zeige Notify an");
     notifier.notify({
         title,
         message,
@@ -45,14 +46,14 @@ function Notify({title, message}){
 module.exports = {
     shutdown: () => {
         try{
-            return null;
+            return winShutdown();
         } catch(err){
             return {err};
         }
     },
     restart: () => {
         try{
-            return null;
+            return winRestart();
         } catch(err){
             return {err};
         }
