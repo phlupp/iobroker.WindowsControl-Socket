@@ -54,7 +54,7 @@ function main(){
                     await setObjectAsync('0_userdata.0.' + dpidShut,obj);
                     on({id: `${clientDp}.${commandShut}`, change: "any"}, async function (obj) {
                         if(obj.state.val)
-                            shutdown(getSocketFromDp(obj.id));
+                            shutdown(await getSocketFromDp(obj.id));
                     });
                   
                 });
@@ -62,7 +62,7 @@ function main(){
             else{
                 on({id: `${clientDp}.${commandShut}`, change: "any"}, async function (obj) {
                     if(obj.state.val)
-                        shutdown(getSocketFromDp(obj.id));
+                        shutdown(await getSocketFromDp(obj.id));
                 });
             }
     
@@ -81,14 +81,14 @@ function main(){
                     
                     on({id: `${clientDp}.${commandRest}`, change: "any"}, async function (obj) {
                         if(obj.state.val)
-                            restart(getSocketFromDp(obj.id));
+                            restart(await getSocketFromDp(obj.id));
                     });
                 });
             }
             else{
                 on({id: `${clientDp}.${commandRest}`, change: "any"}, async function (obj) {
                     if(obj.state.val)
-                        restart(getSocketFromDp(obj.id));
+                        restart(await getSocketFromDp(obj.id));
                 });
             }
     
@@ -101,14 +101,14 @@ function main(){
                 createUserStates('0_userdata.0',false,dp, () => {
                     on({id: `${clientDp}.${commandNoti}`, change: "any"}, async function (obj) {
                         if(obj.state.val.length > 0)
-                            sendNotify(getSocketFromDp(obj.id),obj.state.val);
+                            sendNotify(await getSocketFromDp(obj.id),obj.state.val);
                     });
                 });
             }
             else{
                 on({id: `${clientDp}.${commandNoti}`, change: "any"}, async function (obj) {
                     if(obj.state.val.length > 0)
-                        sendNotify(getSocketFromDp(obj.id),obj.state.val);
+                        sendNotify(await getSocketFromDp(obj.id),obj.state.val);
                 });
             }
     
@@ -122,14 +122,14 @@ function main(){
                 createUserStates('0_userdata.0',false,dp, () => {
                     on({id: `${clientDp}.${commandPower}`, change: "any"}, async function (obj) {
                         if(obj.state.val.length > 0)
-                            sendPowershell(getSocketFromDp(obj.id),obj.state.val);
+                            sendPowershell(await getSocketFromDp(obj.id),obj.state.val);
                     });
                 });
             }
             else{
                 on({id: `${clientDp}.${commandPower}`, change: "any"}, async function (obj) {
                     if(obj.state.val.length > 0)
-                        sendPowershell(getSocketFromDp(obj.id),obj.state.val);
+                        sendPowershell(await getSocketFromDp(obj.id),obj.state.val);
                 });
             }
         }
@@ -145,15 +145,12 @@ function main(){
     }
 
     server.on('connection',socket => {
-        // _socket = socket;
         listSockets.push(socket);
         const address = getIpFromSocket(socket);
         createClient(address);
-        socket.emit('cmd',{id: getNewId(),typ: 4,cmd:"test"});
         socket.on('disconnect', function(reason) {
             log(`Disconnected from ${address}`);
             listSockets = listSockets.filter(s => s != socket); // Entferne Socket von der Liste
-            // _socket = null;
         });
     
         log('Connected with ' + address);
@@ -186,16 +183,13 @@ function main(){
     
     
     function sendNotify(socket,message, title = ''){
-        return;
         if(!socket) return;
-        console.log("sendNotify: " + JSON.stringify(socket));
         message = base64Encode(message);
         if(title && title.length > 0)
             title = base64Encode(title);
     
         const notify = {title, message};
         const obj = {id: getNewId(),typ: 4,cmd:notify};
-        log(`Send notify ` + JSON.stringify(obj));
         socket.emit('cmd',obj, clientCallback);
     }
     
@@ -211,8 +205,6 @@ function main(){
     async function getSocketFromDp(dp){
         const obj = await getObjectAsync(dp);
         const socket = listSockets.find(s => getIpFromSocket(s) === obj.common.ip);
-        console.log("emit");
-        
         return socket;
     }
     
