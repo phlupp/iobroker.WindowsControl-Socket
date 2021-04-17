@@ -14,9 +14,6 @@ const idNotify = '0_userdata.0.Datenpunkte.Funktion.WindowsControl.1.Nachricht';
 // Diese werden Base64 encodiert übetragen und dann decodiert auf dem Ziel PC ausgeführt
 const idPowershell = '0_userdata.0.Datenpunkte.Funktion.WindowsControl.1.Powershell';
 
-
-const states = ['Shutdown','Restart','Notification','Powershell'];
-
 // Unter dem folgenden Ordner werden die notwendigen Datenpunkte angelegt
 const idRootFolder = '0_userdata.0.Datenpunkte.Funktion.WindowsControlNode';
 
