@@ -34,7 +34,6 @@ function Notify({title, message}){
         icon = path.join(__dirname,icon);
     if(!title)
         title = "Nachricht vom Server";
-    console.log("Zeige Notify an");
     notifier.notify({
         title,
         message,
