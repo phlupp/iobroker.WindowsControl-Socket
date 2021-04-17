@@ -1,0 +1,37 @@
+{
+  "name": "wincontrol_api",
+  "version": "0.1.0",
+  "description": "",
+  "main": "client.js",
+  "dependencies": {
+    "chokidar": "^3.5.1",
+    "cookie-parser": "~1.4.4",
+    "cote": "^1.0.2",
+    "dayjs": "^1.10.4",
+    "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
+    "exact": "^0.8.0",
+    "express": "~4.16.1",
+    "fs": "^0.0.1-security",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1",
+    "node-notifier": "^9.0.0",
+    "node-powershell": "^4.0.0",
+    "node-windows": "^1.0.0-beta.5",
+    "os": "^0.1.1",
+    "path": "0.12.7",
+    "remove": "^0.1.5",
+    "socket.io": "^3.1.1",
+    "socket.io-client": "^3.1.1",
+    "wintools": "0.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "scripts": {
+    "dev": "nodemon client"
+  },
+  "author": "Yannick Mickler",
+  "license": "ISC"
+}
