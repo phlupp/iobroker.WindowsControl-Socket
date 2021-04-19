@@ -2,6 +2,7 @@
 const Shell = require('node-powershell');
 const notifier = require('node-notifier');
 const path = require('path');
+const si = require('systeminformation');
 const {shutdown} = require('wintools');
 
 
@@ -27,6 +28,10 @@ function winRestart(){
     shutdown.restart();
 }
 
+function getSystemInfos(){
+    return si.osInfo();
+}
+
 
 function Notify({title, message}){
     let icon = process.env.IO_LOGO_PATH;
@@ -39,8 +44,8 @@ function Notify({title, message}){
         message,
         icon: process.env.IO_LOGO_PATH
       });
-      
 }
+
 
 module.exports = {
     shutdown: () => {
@@ -60,6 +65,13 @@ module.exports = {
     notify: ({title, message}) => {
         try{
             return Notify({title, message});
+        } catch(err){
+            return {err};
+        }
+    },
+    systemInfo: () => {
+        try{
+            return getSystemInfos();
         } catch(err){
             return {err};
         }

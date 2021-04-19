@@ -11,6 +11,13 @@ socket.on('disconnect', () => {
   console.log('Disconnected');
 });
 
+socket.on('discn', () => {
+    // Client already connected so close application
+    console.log('Already connected, will be disconnected');
+    socket.close();
+    process.exit(0);
+})
+
 // handle the event sent with socket.send()
 socket.on('cmd', (data, cb) => {
     console.log(`Message vom server: ` + JSON.stringify(data));
@@ -31,7 +38,7 @@ socket.on('cmd', (data, cb) => {
         break;
         case 3: 
             {
-                
+                answer = win.systemInfo();
             }
         break;
         case 4: // Notification
@@ -59,3 +66,7 @@ socket.on('cmd', (data, cb) => {
 function base64Decode(text){
     return Buffer.from(text, 'base64').toString('utf-8');
 }
+
+// // test
+
+// console.log(win.systemInfo());
