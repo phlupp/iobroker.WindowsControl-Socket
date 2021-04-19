@@ -36,7 +36,7 @@ async function getSystemInfos(){
 
 
 function Notify({title, message}){
-    let icon = process.env.IO_LOGO_PATH;
+    let icon = process.env.IO_LOGO_PATH ?? `./io_logo.png`;
     if(icon)
         icon = path.join(__dirname,icon);
     if(!title)
@@ -44,7 +44,7 @@ function Notify({title, message}){
     notifier.notify({
         title,
         message,
-        icon: process.env.IO_LOGO_PATH
+        icon: process.env.IO_LOGO_PATH ?? ./io_logo.png
       });
 }
 
