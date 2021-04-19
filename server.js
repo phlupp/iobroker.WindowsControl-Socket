@@ -33,147 +33,115 @@ function main(){
     
         async function createStates(){
             const parent = clientDp.replace('0_userdata.0.','');
-            const dpButton = ['', {'name': 'client', 'icon':''}];
+            const dpButton = [{'name': 'client', 'icon':''}];
 
-            // Shutdown
-            let commandShut = 'Shutdown';
-            let dpidShut = `${parent}.${commandShut}`;
-            if(!(await existsStateAsync(`${clientDp}.${commandShut}`))){
-                console.log(dpidShut + ` will be created`);
-                const dp = [dpidShut,...dpButton];
-                dp[1].name = commandShut;
-                createUserStates('0_userdata.0',false,dp, async () => {
-                    let obj = await getObjectAsync('0_userdata.0.' + dpidShut);
-                    const common ={"role":"button","type":"boolean","read":false,"write":true,ip};
-                    obj =  {...obj,common};
-                    await setObjectAsync('0_userdata.0.' + dpidShut,obj);
-                    on({id: `${clientDp}.${commandShut}`, change: "any"}, async function (obj) {
-                        if(obj.state.val)
-                            shutdown(await getSocketFromDp(obj.id));
-                    });
-                  
-                });
-            }
-            else{
-                let obj = await getObjectAsync('0_userdata.0.' + dpidShut);
-                if(obj.common.ip !== ip)
-                {
-                    console.log("IP will be set for " + '0_userdata.0.' + dpidShut);
-                    obj.common.ip = ip;
-                    await setObjectAsync('0_userdata.0.' + dpidShut,obj);
-                }
-                on({id: `${clientDp}.${commandShut}`, change: "any"}, async function (obj) {
-                    if(obj.state.val)
-                        shutdown(await getSocketFromDp(obj.id));
-                });
-            }
-    
-            // Restart
-            let commandRest = 'Restart';
-            let dpidRest = `${parent}.${commandRest}`;
-            if(!(await existsStateAsync(`${clientDp}.${commandRest}`))){
-                console.log(dpidRest + ` will be created`);
-                const dp = [dpidRest,...dpButton];
-                dp[1].name = commandRest;
-                createUserStates('0_userdata.0',false,dp, async () => {
-                    let obj = await getObjectAsync('0_userdata.0.' + dpidRest);
-                    const common ={"role":"button","type":"boolean","read":false,"write":true,ip};
-                    obj =  {...obj,common};
-                    await setObjectAsync('0_userdata.0.' + dpidRest,obj);
+            const userData = '0_userdata.0';
+
+            async function createButton(name, event, {parentFolder} = {}){
+                const dpIdCreate = `${parentFolder || parent}.${name}`;
+                const dpFull = `${clientDp}.${name}`;
+
+                if(!(await existsStateAsync(dpFull))){
+                    console.log(dpId + ` will be created`);
+                    const dp = [dpIdCreate,...dpButton];
+                    dp[1].name = name;
+                    createUserStates(userData,false,dp, async () => {
+                        let obj = await getObjectAsync(dpFull);
+                        const common = {"role":"button","type":"boolean","read":false,"write":true,ip};
+                        obj =  {...obj,common};
+                        await setObjectAsync(dpFull,obj);
+                        if (event && (typeof event == "function")) 
+                            on({id: dpFull, change: "any"}, event);
                     
-                    on({id: `${clientDp}.${commandRest}`, change: "any"}, async function (obj) {
-                        if(obj.state.val)
-                            restart(await getSocketFromDp(obj.id));
                     });
-                });
-            }
-            else{
-                let obj = await getObjectAsync('0_userdata.0.' + dpidRest);
-                if(obj.common.ip !== ip)
-                {
-                    console.log("IP will be set for " + '0_userdata.0.' + dpidRest);
-                    obj.common.ip = ip;
-                    await setObjectAsync('0_userdata.0.' + dpidRest,obj);
                 }
-                on({id: `${clientDp}.${commandRest}`, change: "any"}, async function (obj) {
-                    if(obj.state.val)
-                        restart(await getSocketFromDp(obj.id));
-                });
-            }
-    
-            // Notification
-            let commandNoti = 'Notification';
-            let dpidNoti = `${parent}.${commandNoti}`;
-            if(!(await existsStateAsync(`${clientDp}.${commandNoti}`))){
-                console.log(dpidNoti + ` will be created`);
-                const dp = [dpidNoti, {'name': commandNoti, 'icon':'','type':'string', ip}];
-                createUserStates('0_userdata.0',false,dp, () => {
-                    on({id: `${clientDp}.${commandNoti}`, change: "any"}, async function (obj) {
-                        if(obj.state.val.length > 0)
-                            sendNotify(await getSocketFromDp(obj.id),obj.state.val);
-                    });
-                });
-            }
-            else{
-                let obj = await getObjectAsync('0_userdata.0.' + dpidNoti);
-                if(obj.common.ip !== ip)
-                {
-                    console.log("IP will be set for " + '0_userdata.0.' + dpidNoti);
-                    obj.common.ip = ip;
-                    await setObjectAsync('0_userdata.0.' + dpidNoti,obj);
+                else{
+                    // Check ip of existing dp
+                    let obj = await getObjectAsync(dpFull);
+                    if(obj.common.ip !== ip)
+                    {
+                        console.log(`Correcting ip of ${dpFull}`);
+                        obj.common.ip = ip;
+                        await setObjectAsync(dpFull,obj);
+                    }
+                    if (event && (typeof event == "function")) 
+                        on({id: dpFull, change: "any"}, event);
                 }
-                on({id: `${clientDp}.${commandNoti}`, change: "any"}, async function (obj) {
-                    if(obj.state.val.length > 0)
-                        sendNotify(await getSocketFromDp(obj.id),obj.state.val);
-                });
-            }
-    
-            // Powershell
-            let commandPower = 'Powershell';
-            let dpidPower = `${parent}.${commandPower}`;
-            if(!(await existsStateAsync(`${clientDp}.${commandPower}`))){
-                console.log(dpidPower + ` will be created`);
-                const dp = [dpidPower, {'name': commandPower, 'icon':'','type':'string', ip}];
-                createUserStates('0_userdata.0',false,dp, () => {
-                    on({id: `${clientDp}.${commandPower}`, change: "any"}, async function (obj) {
-                        if(obj.state.val.length > 0)
-                            sendPowershell(await getSocketFromDp(obj.id),obj.state.val);
-                    });
-                });
-            }
-            else{
-                let obj = await getObjectAsync('0_userdata.0.' + dpidPower);
-                if(obj.common.ip !== ip)
-                {
-                    console.log("IP will be set for " + '0_userdata.0.' + dpidPower);
-                    obj.common.ip = ip;
-                    await setObjectAsync('0_userdata.0.' + dpidPower,obj);
-                }
-                on({id: `${clientDp}.${commandPower}`, change: "any"}, async function (obj) {
-                    if(obj.state.val.length > 0)
-                        sendPowershell(await getSocketFromDp(obj.id),obj.state.val);
-                });
             }
 
-            // Informations
-            // Connected
-            let commandConn = 'Connected';
-            let dpidConn = `${parent}.Info.${commandConn}`;
-            if(!(await existsStateAsync(`${clientDp}.Info.${commandConn}`))){
-                console.log(dpidConn + ` will be created`);
-                const dp = [dpidConn, {'name': commandConn,'type':'boolean','write':true,'read':true,'def':true, ip}];
-                console.log("power:" + JSON.stringify(dp[1]));
-                createUserStates('0_userdata.0',false,dp);
-            }
-            else{
-                let obj = await getObjectAsync('0_userdata.0.' + dpidConn);
-                if(obj.common.ip !== ip)
-                {
-                    console.log("IP will be set for " + '0_userdata.0.' + dpidConn);
-                    obj.common.ip = ip;
-                    await setObjectAsync('0_userdata.0.' + dpidConn,obj);
+            async function createTextDp(name, event, {parentFolder} = {})
+            {
+                const dpIdCreate = `${parentFolder || parent}.${name}`;
+                const dpFull = `${clientDp}.${name}`;
+
+                if(!(await existsStateAsync(dpFull))){
+                    console.log(dpId + ` will be created`);
+                    const dp = [dpIdCreate, {'name': name,'type':'string', ip}];
+
+                    dp[1].name = name;
+                    createUserStates(userData,false,dp, async () => {
+                        if (event && (typeof event == "function")) 
+                            on({id: dpFull, change: "any"}, event)
+                    });
+                }
+                else{
+                    // Check ip of existing dp
+                    let obj = await getObjectAsync(dpFull);
+                    if(obj.common.ip !== ip)
+                    {
+                        console.log(`Correcting ip of ${dpFull}`);
+                        obj.common.ip = ip;
+                        await setObjectAsync(dpFull,obj);
+                    }
+                    if (event && (typeof event == "function")) 
+                        on({id: dpFull, change: "any"}, event)
                 }
             }
+
+            async function createInformation(name)
+            {
+                const dpIdCreate = `${parent}.Info.${name}`;
+                const dpFull = `${clientDp}.Info.${name}`;
+
+                if(!(await existsStateAsync(dpFull))){
+                    console.log(dpFull + ` will be created`);
+                    const dp = [dpIdCreate, {'name': name,'type':'string', ip, 'write':false}];
+                    dp[1].name = name;
+                    createUserStates(userData,false,dp);
+                }
+                else{
+                    // Check ip of existing dp
+                    let obj = await getObjectAsync(dpFull);
+                    if(obj.common.ip !== ip)
+                    {
+                        console.log(`Correcting ip of ${dpFull}`);
+                        obj.common.ip = ip;
+                        await setObjectAsync(dpFull,obj);
+                    }
+                }
+            }
+            
+            await createButton(`Shutdown`, async function(obj){
+                if(obj.state.val) shutdown(await getSocketFromDp(obj.id));
+            });
+
+            await createButton(`Restart`,async function(obj){
+                if(obj.state.val) restart(await getSocketFromDp(obj.id));
+            })
+
+            await createTextDp(`Notification`, async function(obj){
+                if(obj.state.val.length > 0) sendNotify(await getSocketFromDp(obj.id),obj.state.val);
+            });
+
+            await createTextDp(`Powershell`, async function(obj){
+                if(obj.state.val.length > 0) sendPowershell(await getSocketFromDp(obj.id),obj.state.val);
+            });
+
+            await createInformation(`Connected`);
+            await createInformation(`Hostname`);
+            await createInformation(`Architektur`);
+            await createInformation(`Distro`);
+
         }
     }
     
@@ -190,23 +158,29 @@ function main(){
         return `${idRootFolder}.${ip.replace(/\./g,'_')}.Info`
     }
 
+  
+
     server.on('connection',async (socket) => {
         const address = getIpFromSocket(socket);
         // Check if already exists
         if(listSockets.find(s => getIpFromSocket(s) === address))
         {
             console.log(`IP ${address} is already connected and will be disconnected`);
-            socket.emit("discn");
+            socket.emit("discn",`Client is already connected, new one will be disconnected`);
             return;
         }
         listSockets.push(socket);
         const dpConnected = getDpInfo(address) + '.Connected';
         await createClient(address);
         if(await (existsStateAsync(dpConnected)))
-            await setStateAsync(dpConnected,true);
+            await setStateAsync(dpConnected,`true`);
+
+        // Get System Infos
+        getSysteminfo(socket);
+
         socket.on('disconnect', async function(reason) {
             log(`Disconnected from ${address}`);
-            await setStateAsync(dpConnected,false);
+            await setStateAsync(dpConnected,`false`);
             listSockets = listSockets.filter(s => s != socket); // Entferne Socket von der Liste
         });
     
@@ -241,10 +215,12 @@ function main(){
     
     function sendNotify(socket,message, title = ''){
         if(!socket) return;
+        console.log('Send to client: ' + message);
         message = base64Encode(message);
         if(title && title.length > 0)
             title = base64Encode(title);
     
+        
         const notify = {title, message};
         const obj = {id: getNewId(),typ: 4,cmd:notify};
         socket.emit('cmd',obj, clientCallback);
@@ -257,6 +233,37 @@ function main(){
         log(`Send powershell ` + JSON.stringify(obj));
         if(socket != null)
             socket.emit('cmd',obj,clientCallback);
+    }
+
+    async function getSysteminfo(socket)
+    {
+        if(!socket) return;
+        const typ = 3;
+        const obj = {id: getNewId(),typ};
+        if(socket != null)
+            socket.emit('cmd',obj, ({answer}) => setSystemInfos(answer, socket));
+    }
+
+    async function setSystemInfos(obj, socket)
+    {
+        const dpFolderInfo = `${idRootFolder}.${getIpFromSocket(socket).replace(/\./g,'_')}.Info.`;
+        const {
+            distro // z.B. Windows 10
+            ,arch // z.B. 64 bit
+            ,hostname // Rechnername
+        } = obj;
+        let dpName = dpFolderInfo + `Distro`;
+        if(distro && await existsStateAsync(dpName))
+            await setStateAsync(dpName, distro);
+        
+        dpName = dpFolderInfo + `Architektur`;
+        if(arch && await existsStateAsync(dpName))
+            await setStateAsync(dpName, arch);
+
+        dpName = dpFolderInfo + `Hostname`;
+        if(hostname && await existsStateAsync(dpName))
+            await setStateAsync(dpName, hostname);
+
     }
     
     async function getSocketFromDp(dp){
@@ -279,7 +286,7 @@ function clean(){
 }
 
 try{
-    main();
+    await main();
 } catch(err){
     clean();
 }

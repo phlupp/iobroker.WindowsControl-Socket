@@ -28,8 +28,10 @@ function winRestart(){
     shutdown.restart();
 }
 
-function getSystemInfos(){
-    return si.osInfo();
+async function getSystemInfos(){
+    console.log(`Get system infos`);
+    const info = await si.osInfo();
+    return {answer: info};
 }
 
 

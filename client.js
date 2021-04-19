@@ -1,7 +1,7 @@
 require('dotenv').config();
 const io = require("socket.io-client");
 const win = require("./win");
-const socket = io.connect(`ws://${process.env.WIN_CONTROL_SERVER_ADRESS ?? "localhost"}:${process.env.WIN_CONTROL_PORT ?? 8588}` );
+const socket = io.connect(`ws://${process.env.SERVER_IP ?? "localhost"}:${process.env.SERVER_PORT ?? 8588}` );
 
 socket.on('connect', () => {
   console.log(`Connected`);
@@ -11,15 +11,15 @@ socket.on('disconnect', () => {
   console.log('Disconnected');
 });
 
-socket.on('discn', () => {
+socket.on('discn', (message) => {
     // Client already connected so close application
-    console.log('Already connected, will be disconnected');
+    console.log(message);
     socket.close();
     process.exit(0);
 })
 
 // handle the event sent with socket.send()
-socket.on('cmd', (data, cb) => {
+socket.on('cmd', async (data, cb) => {
     console.log(`Message vom server: ` + JSON.stringify(data));
     const {typ, id, cmd} = data;
     let answer = {};
@@ -38,7 +38,7 @@ socket.on('cmd', (data, cb) => {
         break;
         case 3: 
             {
-                answer = win.systemInfo();
+                answer = await win.systemInfo();
             }
         break;
         case 4: // Notification
@@ -59,14 +59,12 @@ socket.on('cmd', (data, cb) => {
         break;
     }
     if (cb && (typeof cb == "function")) {
-        cb({...answer, id,error});
+        const retValue = {...answer, id,error};
+        console.log(`Return object: ` + JSON.stringify(retValue));
+        cb(retValue);
     }
 });
 
 function base64Decode(text){
     return Buffer.from(text, 'base64').toString('utf-8');
 }
-
-// // test
-
-// console.log(win.systemInfo());
