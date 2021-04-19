@@ -44,7 +44,7 @@ function Notify({title, message}){
     notifier.notify({
         title,
         message,
-        icon: process.env.IO_LOGO_PATH ?? ./io_logo.png
+        icon: process.env.IO_LOGO_PATH ?? `./io_logo.png`
       });
 }
 
