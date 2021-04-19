@@ -12,141 +12,13 @@ const idNotify = '0_userdata.0.Datenpunkte.Funktion.WindowsControl.1.Nachricht';
 
 // Mit dem folgenden Datenpunkt können Powershell Befehle und Skripte direkt als Text übetragen werden
 // Diese werden Base64 encodiert übetragen und dann decodiert auf dem Ziel PC ausgeführt
-const idPowershell = '0_userdata.0.Datenpunkte.Funktion.WindowsControl.1.Powershell';
+const idPowershell = '0_userdata.0.Datenpunkte.Funktion.WindowsControl.1.Powershell';;
 
 // Unter dem folgenden Ordner werden die notwendigen Datenpunkte angelegt
 const idRootFolder = '0_userdata.0.Datenpunkte.Funktion.WindowsControlNode';
 
 let DEBUG = true;
 let listSockets = [];
-
-
-
-/**
- * Create states under 0_userdata.0 or javascript.x
- * Current Version:     https://github.com/Mic-M/iobroker.createUserStates
- * Support:             https://forum.iobroker.net/topic/26839/
- * Autor:               Mic (ioBroker) | Mic-M (github)
- * Version:             1.1 (26 January 2020)
- * Example:             see https://github.com/Mic-M/iobroker.createUserStates#beispiel
- * -----------------------------------------------
- * PLEASE NOTE: Per https://github.com/ioBroker/ioBroker.javascript/issues/474, the used function setObject() 
- *              executes the callback PRIOR to completing the state creation. Therefore, we use a setTimeout and counter. 
- * -----------------------------------------------
- * @param {string} where          Where to create the state: '0_userdata.0' or 'javascript.x'.
- * @param {boolean} force         Force state creation (overwrite), if state is existing.
- * @param {array} statesToCreate  State(s) to create. single array or array of arrays
- * @param {object} [callback]     Optional: a callback function -- This provided function will be executed after all states are created.
- */
- function createUserStates(where, force, statesToCreate, callback = undefined) {
- 
-    const WARN = false; // Only for 0_userdata.0: Throws warning in log, if state is already existing and force=false. Default is false, so no warning in log, if state exists.
-    const LOG_DEBUG = false; // To debug this function, set to true
-    // Per issue #474 (https://github.com/ioBroker/ioBroker.javascript/issues/474), the used function setObject() executes the callback 
-    // before the state is actual created. Therefore, we use a setTimeout and counter as a workaround.
-    const DELAY = 50; // Delay in milliseconds (ms). Increase this to 100, if it is not working.
-
-    // Validate "where"
-    if (where.endsWith('.')) where = where.slice(0, -1); // Remove trailing dot
-    if ( (where.match(/^((javascript\.([1-9][0-9]|[0-9]))$|0_userdata\.0$)/) == null) ) {
-        log('This script does not support to create states under [' + where + ']', 'error');
-        return;
-    }
-
-    // Prepare "statesToCreate" since we also allow a single state to create
-    if(!Array.isArray(statesToCreate[0])) statesToCreate = [statesToCreate]; // wrap into array, if just one array and not inside an array
-
-    // Add "where" to STATES_TO_CREATE
-    for (let i = 0; i < statesToCreate.length; i++) {
-        let lpPath = statesToCreate[i][0].replace(/\.*\./g, '.'); // replace all multiple dots like '..', '...' with a single '.'
-        lpPath = lpPath.replace(/^((javascript\.([1-9][0-9]|[0-9])\.)|0_userdata\.0\.)/,'') // remove any javascript.x. / 0_userdata.0. from beginning
-        lpPath = where + '.' + lpPath; // add where to beginning of string
-        statesToCreate[i][0] = lpPath;
-    }
-
-    if (where != '0_userdata.0') {
-        // Create States under javascript.x
-        let numStates = statesToCreate.length;
-        statesToCreate.forEach(function(loopParam) {
-            if (LOG_DEBUG) log('[Debug] Now we are creating new state [' + loopParam[0] + ']');
-            let loopInit = (loopParam[1]['def'] == undefined) ? null : loopParam[1]['def']; // mimic same behavior as createState if no init value is provided
-            createState(loopParam[0], loopInit, force, loopParam[1], function() {
-                numStates--;
-                if (numStates === 0) {
-                    if (LOG_DEBUG) log('[Debug] All states processed.');
-                    if (typeof callback === 'function') { // execute if a function was provided to parameter callback
-                        if (LOG_DEBUG) log('[Debug] Function to callback parameter was provided');
-                        return callback();
-                    } else {
-                        return;
-                    }
-                }
-            });
-        });
-    } else {
-        // Create States under 0_userdata.0
-        let numStates = statesToCreate.length;
-        let counter = -1;
-        statesToCreate.forEach(function(loopParam) {
-            counter += 1;
-            if (LOG_DEBUG) log ('[Debug] Currently processing following state: [' + loopParam[0] + ']');
-            if( ($(loopParam[0]).length > 0) && (existsState(loopParam[0])) ) { // Workaround due to https://github.com/ioBroker/ioBroker.javascript/issues/478
-                // State is existing.
-                if (WARN && !force) log('State [' + loopParam[0] + '] is already existing and will no longer be created.', 'warn');
-                if (!WARN && LOG_DEBUG) log('[Debug] State [' + loopParam[0] + '] is already existing. Option force (=overwrite) is set to [' + force + '].');
-                if(!force) {
-                    // State exists and shall not be overwritten since force=false
-                    // So, we do not proceed.
-                    numStates--;
-                    if (numStates === 0) {
-                        if (LOG_DEBUG) log('[Debug] All states successfully processed!');
-                        if (typeof callback === 'function') { // execute if a function was provided to parameter callback
-                            if (LOG_DEBUG) log('[Debug] An optional callback function was provided, which we are going to execute now.');
-                            return callback();
-                        }
-                    } else {
-                        // We need to go out and continue with next element in loop.
-                        return; // https://stackoverflow.com/questions/18452920/continue-in-cursor-foreach
-                    }
-                } // if(!force)
-            }
-
-            // State is not existing or force = true, so we are continuing to create the state through setObject().
-            let obj = {};
-            obj.type = 'state';
-            obj.native = {};
-            obj.common = loopParam[1];
-            setObject(loopParam[0], obj, function (err) {
-                if (err) {
-                    log('Cannot write object for state [' + loopParam[0] + ']: ' + err);
-                } else {
-                    if (LOG_DEBUG) log('[Debug] Now we are creating new state [' + loopParam[0] + ']')
-                    let init = null;
-                    if(loopParam[1].def === undefined) {
-                        if(loopParam[1].type === 'number') init = 0;
-                        if(loopParam[1].type === 'boolean') init = false;
-                        if(loopParam[1].type === 'string') init = '';
-                    } else {
-                        init = loopParam[1].def;
-                    }
-                    setTimeout(function() {
-                        setState(loopParam[0], init, true, function() {
-                            if (LOG_DEBUG) log('[Debug] setState durchgeführt: ' + loopParam[0]);
-                            numStates--;
-                            if (numStates === 0) {
-                                if (LOG_DEBUG) log('[Debug] All states processed.');
-                                if (typeof callback === 'function') { // execute if a function was provided to parameter callback
-                                    if (LOG_DEBUG) log('[Debug] Function to callback parameter was provided');
-                                    return callback();
-                                }
-                            }
-                        });
-                    }, DELAY + (20 * counter) );
-                }
-            });
-        });
-    }
-}
 
 
 function main(){
@@ -160,9 +32,7 @@ function main(){
         
     
         async function createStates(){
-            console.log("CreateStates");
             const parent = clientDp.replace('0_userdata.0.','');
-    
             const dpButton = ['', {'name': 'client', 'icon':''}];
 
             // Shutdown
@@ -185,6 +55,13 @@ function main(){
                 });
             }
             else{
+                let obj = await getObjectAsync('0_userdata.0.' + dpidShut);
+                if(obj.common.ip !== ip)
+                {
+                    console.log("IP will be set for " + '0_userdata.0.' + dpidShut);
+                    obj.common.ip = ip;
+                    await setObjectAsync('0_userdata.0.' + dpidShut,obj);
+                }
                 on({id: `${clientDp}.${commandShut}`, change: "any"}, async function (obj) {
                     if(obj.state.val)
                         shutdown(await getSocketFromDp(obj.id));
@@ -200,8 +77,8 @@ function main(){
                 dp[1].name = commandRest;
                 createUserStates('0_userdata.0',false,dp, async () => {
                     let obj = await getObjectAsync('0_userdata.0.' + dpidRest);
-                    const common ={"role":"button","type":"boolean","read":false,"write":true};
-                    obj =  {...obj,common, ip};
+                    const common ={"role":"button","type":"boolean","read":false,"write":true,ip};
+                    obj =  {...obj,common};
                     await setObjectAsync('0_userdata.0.' + dpidRest,obj);
                     
                     on({id: `${clientDp}.${commandRest}`, change: "any"}, async function (obj) {
@@ -211,6 +88,13 @@ function main(){
                 });
             }
             else{
+                let obj = await getObjectAsync('0_userdata.0.' + dpidRest);
+                if(obj.common.ip !== ip)
+                {
+                    console.log("IP will be set for " + '0_userdata.0.' + dpidRest);
+                    obj.common.ip = ip;
+                    await setObjectAsync('0_userdata.0.' + dpidRest,obj);
+                }
                 on({id: `${clientDp}.${commandRest}`, change: "any"}, async function (obj) {
                     if(obj.state.val)
                         restart(await getSocketFromDp(obj.id));
@@ -231,6 +115,13 @@ function main(){
                 });
             }
             else{
+                let obj = await getObjectAsync('0_userdata.0.' + dpidNoti);
+                if(obj.common.ip !== ip)
+                {
+                    console.log("IP will be set for " + '0_userdata.0.' + dpidNoti);
+                    obj.common.ip = ip;
+                    await setObjectAsync('0_userdata.0.' + dpidNoti,obj);
+                }
                 on({id: `${clientDp}.${commandNoti}`, change: "any"}, async function (obj) {
                     if(obj.state.val.length > 0)
                         sendNotify(await getSocketFromDp(obj.id),obj.state.val);
@@ -243,7 +134,6 @@ function main(){
             if(!(await existsStateAsync(`${clientDp}.${commandPower}`))){
                 console.log(dpidPower + ` will be created`);
                 const dp = [dpidPower, {'name': commandPower, 'icon':'','type':'string', ip}];
-                console.log("power:" + JSON.stringify(dp[1]));
                 createUserStates('0_userdata.0',false,dp, () => {
                     on({id: `${clientDp}.${commandPower}`, change: "any"}, async function (obj) {
                         if(obj.state.val.length > 0)
@@ -252,10 +142,37 @@ function main(){
                 });
             }
             else{
+                let obj = await getObjectAsync('0_userdata.0.' + dpidPower);
+                if(obj.common.ip !== ip)
+                {
+                    console.log("IP will be set for " + '0_userdata.0.' + dpidPower);
+                    obj.common.ip = ip;
+                    await setObjectAsync('0_userdata.0.' + dpidPower,obj);
+                }
                 on({id: `${clientDp}.${commandPower}`, change: "any"}, async function (obj) {
                     if(obj.state.val.length > 0)
                         sendPowershell(await getSocketFromDp(obj.id),obj.state.val);
                 });
+            }
+
+            // Informations
+            // Connected
+            let commandConn = 'Connected';
+            let dpidConn = `${parent}.Info.${commandConn}`;
+            if(!(await existsStateAsync(`${clientDp}.Info.${commandConn}`))){
+                console.log(dpidConn + ` will be created`);
+                const dp = [dpidConn, {'name': commandConn,'type':'boolean','write':true,'read':true,'def':true, ip}];
+                console.log("power:" + JSON.stringify(dp[1]));
+                createUserStates('0_userdata.0',false,dp);
+            }
+            else{
+                let obj = await getObjectAsync('0_userdata.0.' + dpidConn);
+                if(obj.common.ip !== ip)
+                {
+                    console.log("IP will be set for " + '0_userdata.0.' + dpidConn);
+                    obj.common.ip = ip;
+                    await setObjectAsync('0_userdata.0.' + dpidConn,obj);
+                }
             }
         }
     }
@@ -269,12 +186,27 @@ function main(){
         return socket.handshake.address.split(':').pop();
     }
 
-    server.on('connection',socket => {
-        listSockets.push(socket);
+    function getDpInfo(ip){
+        return `${idRootFolder}.${ip.replace(/\./g,'_')}.Info`
+    }
+
+    server.on('connection',async (socket) => {
         const address = getIpFromSocket(socket);
-        createClient(address);
-        socket.on('disconnect', function(reason) {
+        // Check if already exists
+        if(listSockets.find(s => getIpFromSocket(s) === address))
+        {
+            console.log(`IP ${address} is already connected and will be disconnected`);
+            socket.emit("discn");
+            return;
+        }
+        listSockets.push(socket);
+        const dpConnected = getDpInfo(address) + '.Connected';
+        await createClient(address);
+        if(await (existsStateAsync(dpConnected)))
+            await setStateAsync(dpConnected,true);
+        socket.on('disconnect', async function(reason) {
             log(`Disconnected from ${address}`);
+            await setStateAsync(dpConnected,false);
             listSockets = listSockets.filter(s => s != socket); // Entferne Socket von der Liste
         });
     
