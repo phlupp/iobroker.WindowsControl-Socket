@@ -133,7 +133,7 @@ class Client
                         await setObjectAsync(id,obj);
                         Debug(`Created`);
                     }
-                    if (this.dpHasChanged) this.dpHasChanged(this.dp, options);
+                    if (this.dpHasChanged) await this.dpHasChanged(this.dp, options);
                     return this;
                 } catch (error) {
                     Error(err);
@@ -160,12 +160,12 @@ class Client
             const{notification,powershell, shutdown, restart} = this.client;
             
             await notification.setDp(`${folderFunctions}.Notification`, {func: async (obj) => {
-                if(obj.state.val.length == 0) return;
+                if(obj.state.val.length === 0) return;
                 await this.sendNotify(obj.state.val);
             }});
 
             await powershell.setDp(`${folderFunctions}.Powershell`, {func: async (obj) => {
-                if(obj.state.val.length == 0) return;
+                if(obj.state.val.length === 0) return;
                 await this.sendPowershell(obj.state.val);
             }});
 
