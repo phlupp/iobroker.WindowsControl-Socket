@@ -4,7 +4,8 @@ const notifier = require('node-notifier');
 const path = require('path');
 const si = require('systeminformation');
 const {shutdown} = require('wintools');
-
+let notifies = [];
+let interNotifies = null;
 
 function executePowershell(cmd){
     console.log(`Execute Powershell command:\n${cmd}`);
@@ -21,31 +22,46 @@ function executePowershell(cmd){
 }
 
 function winShutdown(){
-    shutdown.poweroff();
+    return shutdown.poweroff();
 }
 
 function winRestart(){
-    shutdown.restart();
+    return shutdown.restart();
 }
 
 async function getSystemInfos(){
     console.log(`Get system infos`);
-    const info = await si.osInfo();
-    return {answer: info};
+    return await si.osInfo();
 }
 
+function startNotifyService()
+{
+    if(interNotifies) return;
+    interNotifies = setinterval(() => {
+        const noti = notifies.shift();
+        notifier.notify(noti);
+        if(notifies.length === 0)
+            clearInterval(interNotifies);
+    }, 3000);
+}
 
-function Notify({title, message}){
+async function Notify({title, message}){
     let icon = process.env.IO_LOGO_PATH ?? `./io_logo.png`;
     if(icon)
         icon = path.join(__dirname,icon);
     if(!title)
-        title = "Nachricht vom Server";
-    notifier.notify({
+        title = "Nachricht von ioBroker";
+
+    console.log(`Show notification: ` + message);
+    const notifyObj = {
         title,
         message,
         icon: process.env.IO_LOGO_PATH ?? `./io_logo.png`
-      });
+      };
+
+    // notifies.push(notifyObj);
+    // startNotifyService();
+    await notifier.notify(notifyObj);
 }
 
 
@@ -64,25 +80,22 @@ module.exports = {
             return {err};
         }
     },
-    notify: ({title, message}) => {
+    notify: async ({title, message}) => {
+        return await Notify({title, message});
+    },
+    systemInfo: async () => {
         try{
-            return Notify({title, message});
+            return await getSystemInfos();
         } catch(err){
             return {err};
         }
     },
-    systemInfo: () => {
-        try{
-            return getSystemInfos();
-        } catch(err){
-            return {err};
-        }
-    },
-    powershell: (cmd) => {
+    powershell: (cmd,cb) => {
         try{
             return executePowershell(cmd);
         } catch(err){
-            return {err};
+            console.log(err);
+            if(cb) cb(err);
         }
     }
 }

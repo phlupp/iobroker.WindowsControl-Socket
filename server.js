@@ -17,10 +17,7 @@ const idPowershell = '0_userdata.0.Datenpunkte.Funktion.WindowsControl.1.Powersh
 // Unter dem folgenden Ordner werden die notwendigen Datenpunkte angelegt
 const idRootFolder = '0_userdata.0.Datenpunkte.Funktion.WindowsControlNode';
 
-let DEBUG = true;
-// let listSockets = [];
-
-// let lisDpEvents = [];
+const DEBUG = false;
 
 class Client
 {
@@ -47,9 +44,7 @@ class Client
     async init(parentFolder)
     {
         await this.setParentFolder(parentFolder);
-        // await this.checkDataPoints(parentFolder);
-        this.prepareEvents();
-        await this.prepareClient();
+        await this.prepareEvents();
         await this.prepareInfos();
 
         Info(`Connected with client ${this.getIp} - ${this.client.infos.hostname.get}`);
@@ -73,7 +68,7 @@ class Client
                 if(await existsObjectAsync(this.getDp()))
                 {
                     await setStateAsync(this.getDp(),v);
-                    console.log(`State ${this.getDp()} changed to ${v}`);
+                    Debug(`State ${this.getDp()} changed to ${v}`);
                 }
                 else
                     Error(`DP ${this.getDp()} konnte nicht gesetzt werden`);
@@ -202,7 +197,7 @@ class Client
         return this.client.infos;
     }
 
-    prepareEvents()
+    async prepareEvents()
     {
         const socket = this.socket.get;
         if(!socket) return;
@@ -214,7 +209,7 @@ class Client
     async prepareInfos()
     {
         try {
-            Info(`Get infos`)
+            Debug(`Get infos`)
             const infos = await this.getSysteminfo();
             const {
                 distro // z.B. Windows 10
@@ -238,15 +233,6 @@ class Client
         }
     }
 
-    async prepareClient()
-    {
-
-    }
-
-    async checkDataPoints()
-    {
-
-    } 
 
     disconnect()
     {
@@ -266,7 +252,7 @@ class Client
         if(!this.socket.get) return Error(`Socket empty`);
         if(!eventName || eventName.length === 0) return Error(`Event empty`)
         
-        Info('Prepare emit');
+        Debug('Prepare emit');
         return new Promise((resolve, reject) => {
             let timeout = setTimeout(() => {
                 Warn(`Timeout reached event ${eventName}`)
@@ -541,7 +527,7 @@ function Info(text)
 
 function Debug(text)
 {
-    console.log(text);
+    if(DEBUG) console.log(text);
 }
 
 function Error(text)
