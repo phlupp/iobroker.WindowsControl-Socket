@@ -489,9 +489,15 @@ class ClientList
         return client;
     }
 
+    checkAuthentication(data)
+    {
+        if(!data) return false;
+    }
+
     removeClientByIp(ip)
     {
         const client = this.clients.find(c => c.getIp === ip)
+        Info(`Disconnected from client ${client.getIp} - ${client.client.infos.hostname.get}`);
         if(client) client.client.infos.connected.set = false;
         this.clients = this.clients.filter(c => c.getIp !== ip);
     }
@@ -557,7 +563,7 @@ try{
      * Start Server
      */
     server.listen(8588);
-    log('Listening on port 8588');
+    Info('Listening on port 8588');
 } catch(err){
     clean();
 }
