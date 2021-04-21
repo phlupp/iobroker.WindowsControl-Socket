@@ -62,8 +62,7 @@ socket.on('shutdown', async (cb) => {
     try 
     {
         console.log(`Received shutdown command`);
-        // if(cb) return cb(await win.shutdown(cb));
-        if(cb) return cb(null);
+        if(cb) return cb(await win.shutdown(cb));
         if(cb) cb(new Error(`Command failed`));
     } catch(err)
     {
