@@ -6,6 +6,7 @@ Im Ordner des Projektes muss eine .env angelegt werden und mit folgenden Variabl
 
 
 SERVER_IP => Die IP des Servers der die Verbindung annimmt
+
 SERVER_PORT => Der Port des Servers der die Verbindung annimmt
 
 Beispiel:
