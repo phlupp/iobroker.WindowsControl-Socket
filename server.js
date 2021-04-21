@@ -2,18 +2,6 @@
 // Für socket io muss "socket.io" in der Javascript Instanz als Modul hinzugefügt werden
 const server = require('socket.io')();
 
-// Datenpunkte
-
-// Mit dem folgenden Button wird der Shutdownbefehl gesendet
-const idShutdown = '0_userdata.0.Datenpunkte.Funktion.Yannick_win_shutdown';
-
-// Dies ist ein Text Datenpunkt der eine Benachrichtigung als Windows Notification anzeigt
-const idNotify = '0_userdata.0.Datenpunkte.Funktion.WindowsControl.1.Nachricht';
-
-// Mit dem folgenden Datenpunkt können Powershell Befehle und Skripte direkt als Text übetragen werden
-// Diese werden Base64 encodiert übetragen und dann decodiert auf dem Ziel PC ausgeführt
-const idPowershell = '0_userdata.0.Datenpunkte.Funktion.WindowsControl.1.Powershell';;
-
 // Unter dem folgenden Ordner werden die notwendigen Datenpunkte angelegt
 const idRootFolder = '0_userdata.0.Datenpunkte.Funktion.WindowsControlNode';
 
@@ -120,18 +108,24 @@ class Client
                 try {
                     if(!id || id.length === 0) return;
                     this.dp = id;
-                    
+                    const createDpId = id.replace('0_userdata.0.','');
+                    const dp = this.getDpArrayFromTyp();
+                    dp[0] = createDpId;
+
                     if(!await existsStateAsync(id))
                     {
-                        Info(`Create not existing dp ${id}`);
-                        const createDpId = id.replace('0_userdata.0.','');
-                        const dp = this.getDpArrayFromTyp();
-                        dp[0] = createDpId;
+                        Info(`Create not existing dp ${id}`);  
                         await createUserState('0_userdata.0',false,dp);
-                        let obj = await getObjectAsync(id);
-                        obj.common = {...dp[1]};
-                        await setObjectAsync(id,obj);
                         Debug(`Created`);
+                    } else 
+                    {
+                        const obj = await getObjectAsync(id);
+                        if(!obj.common || !obj.common.id || obj.common.id !== ip)
+                        {
+                            Debug(`Correct ip of dp ` + id);
+                            obj.common = {...dp[1]};
+                            await setObjectAsync(id,obj);    
+                        }
                     }
                     if (this.dpHasChanged) await this.dpHasChanged(this.dp, options);
                     return this;
