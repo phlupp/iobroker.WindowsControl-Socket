@@ -26,7 +26,7 @@ Momentan kann primär der Server Befehle an den Client senden und auch Antworten
 2. Architecture (Architektur)
   Zeigt die Client Architektur an z.B. x64 für 64-Bit
 
-3. Distri (Distribution)
+3. Distribution
    Zeigt die Client Distribution an z.B. Windows 10
 
 4. Hostname (Computer-Name)
