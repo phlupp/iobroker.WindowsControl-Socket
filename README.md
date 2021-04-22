@@ -33,6 +33,11 @@ Momentan kann primär der Server Befehle an den Client senden und auch Antworten
   Zeigt den Client Hostnamen an
 
 ## Konfiguration
+Zuerst das Git Projekt runterladen und im Projektordner den folgenden Befehl durchführen um die Benötigten Abhängigkeiten runterzuladen.
+```
+npm i
+```
+
 ### Server Seite
 1. In der verwendeten JavaScript Instanz, sollte als zusätzliches NPM Modul **socket.io** eingetragen sein.
 2. Die server.js aus diesem Projekt nun als Skript anlegen.
