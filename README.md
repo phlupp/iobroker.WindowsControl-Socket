@@ -1,4 +1,4 @@
-# JavaScript-Funktion
+# WindowsControl-Socket
 
 ## Erklärung
 Mit den Skripten in client.js und server.js lässt sich eine Verbindung zwischen Server und Client per Socket-IO aufbauen.
