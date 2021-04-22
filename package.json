@@ -1,5 +1,5 @@
 {
-  "name": "wincontrol_api",
+  "name": "windowscontrolsocket",
   "version": "0.1.0",
   "description": "",
   "main": "client.js",
@@ -40,5 +40,5 @@
     "dev": "nodemon client"
   },
   "author": "Yannick Mickler",
-  "license": "ISC"
+  "license": "MIT"
 }
