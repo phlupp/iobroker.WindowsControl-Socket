@@ -62,6 +62,8 @@ npm i
 3. Im Projektverzeichnis (Verzeichnis wo die client.js liegt) eine .env anlegen und mit den notwendigen Variablen füllen (siehe unten)
 4. Angepasste AutoStartMitPm2.bat in den Autostart
 
+AutoStartMitPm2:
+
   Bitte den Pfad in der 3 Zeile anpassen, hier muss der Ordner zu diesem Projekt drin stehen
   Das Laufwerk in dem sich der Pfad befindet in Zeile 2
   Der Autostartordner lässt sich leicht öffnen, indem man die Windowsanwendung "Ausführen" öffnet und hier "shell:startup" einträgt.
@@ -94,5 +96,6 @@ SERVER_IP=192.168.2.10
 ## Ideen für weitere Funktionen
 1. Besseres Logging Clientseite (auch mit Logdateien)
 2. Erweiterte Benachrichtigungen
+
   Hierbei könnte laut dem verwendeten NodeJs Modul auch mit dem Tooltip interagiert werden (Klick drauf) und damit Aktionen auf Server Seite auslösen.
   Oder auch eine Pfadangabe für ein alternatives Icon welchen beim Tooltip verwendet wird.
