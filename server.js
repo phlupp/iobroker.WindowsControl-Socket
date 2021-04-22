@@ -214,6 +214,7 @@ class Client
         try {
             Debug(`Get infos`)
             const infos = await this.getSysteminfo();
+            // Destructure the information coming from client
             const {
                 distro // z.B. Windows 10
                 ,arch // z.B. 64 bit
