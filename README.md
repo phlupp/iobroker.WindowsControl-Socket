@@ -71,6 +71,14 @@ SERVER_PORT=8588
 SERVER_IP=192.168.2.10
 ```
 
+### Die wichtigsten verwendeten Module und Credits
+1. Danke an https://github.com/Mic-M dessen Skript zum Anlegen von Datenpunkten ich ein wenig angepasst habe und verwende.
+2. socket.io
+3. wintools
+4. systeminformation
+5. node-notifier
+6. node-powershell
+
 ## Ideen für weitere Funktionen
 1. Besseres Logging Clientseite (auch mit Logdateien)
 2. Erweiterte Benachrichtigungen
