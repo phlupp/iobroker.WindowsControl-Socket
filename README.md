@@ -1,9 +1,19 @@
 # WindowsControlNode
 
+Erklärung:
+
+Server Seite:
+In der verwendeten JavaScript Instanz, sollte als zusätzliches NPM Modul "socket.io" eingetragen sein.
+Die server.js nun als Skript anlegen.
+Nun sind noch Änderungen im Skript notwendig.
+Die Variable idRootFolder sollte angeben, an welche Stelle unter 0_userdata die Datenpunkte angelegt werden.
+Momentan wird nur die Installation unter 0_userdata untersützt.
+
+
+Windows Client:
 Voraussetzungen:
 NodeJs >= v14.16.1
 Global installiertes NodeJs Modul pm2. (npm install -g pm2)
-
 
 
 Um die NodeJs Anwendung auf einem Windowssystem zu starten nutze ich NodeJs v14.16.1 und setze die AutoStartMitPm2.bat in den Autostart Ordner von Windows.
