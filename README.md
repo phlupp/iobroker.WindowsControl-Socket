@@ -33,10 +33,7 @@ Momentan kann primär der Server Befehle an den Client senden und auch Antworten
   Zeigt den Client Hostnamen an
 
 ## Konfiguration
-Zuerst das Git Projekt runterladen und im Projektordner den folgenden Befehl durchführen um die Benötigten Abhängigkeiten runterzuladen.
-```
-npm i
-```
+
 
 ### Server Seite
 1. In der verwendeten JavaScript Instanz, sollte als zusätzliches NPM Modul **socket.io** eingetragen sein.
@@ -46,6 +43,11 @@ npm i
 
 
 ### Windows Client
+Zuerst das Git Projekt runterladen und im Projektordner den folgenden Befehl durchführen um die Benötigten Abhängigkeiten runterzuladen.
+```
+npm i
+```
+
 ### Voraussetzungen
 1. NodeJs >= v14.16.1
 2. Global installiertes NodeJs Modul pm2. (`npm install -g pm2`)
