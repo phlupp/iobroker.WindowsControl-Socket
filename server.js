@@ -26,7 +26,7 @@ class Client
             infos: {
                 architecture: this.newObj(),
                 connected: this.newObj({ typ: 'boolean'}),
-                distri: this.newObj(),
+                distribution: this.newObj(),
                 hostname: this.newObj(),
             },
             notification: this.newObj({write: true}),
@@ -150,11 +150,11 @@ class Client
         try {
             if(!folder || folder.length === 0 || !this.client || !this.client.infos) return;
             const folderInfo = `${folder}.${this.getIpName}.Info`;
-            const {architecture,connected,distri,hostname} = this.client.infos;
+            const {architecture,connected,distribution,hostname} = this.client.infos;
     
             await architecture.setDp(`${folderInfo}.Architecture`);
             await connected.setDp(`${folderInfo}.Connected`);
-            await distri.setDp(`${folderInfo}.distri`);
+            await distribution.setDp(`${folderInfo}.Distribution`);
             await hostname.setDp(`${folderInfo}.Hostname`);
 
             
@@ -215,13 +215,13 @@ class Client
             Debug(`Get infos`)
             const infos = await this.getSysteminfo();
             const {
-                distri // z.B. Windows 10
+                distro // z.B. Windows 10
                 ,arch // z.B. 64 bit
                 ,hostname // Rechnername
             } = infos;
     
-            if(distri)
-                this.client.infos.distri.set = distri;
+            if(distro)
+                this.client.infos.distribution.set = distro;
 
             if(arch)
                 this.client.infos.architecture.set = arch;
@@ -572,7 +572,7 @@ try{
      * Start Server
      */
     server.listen(PORT);
-    Info('Listening on port 8588');
+    Info('Listening on port 8588 for client connection with WindowsControl-Socket');
 } catch(err){
     clean();
 }
