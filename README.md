@@ -70,3 +70,9 @@ Beispiel:
 SERVER_PORT=8588
 SERVER_IP=192.168.2.10
 ```
+
+## Ideen für weitere Funktionen
+1. Besseres Logging Clientseite (auch mit Logdateien)
+2. Erweiterte Benachrichtigungen
+  Hierbei könnte laut dem verwendeten NodeJs Modul auch mit dem Tooltip interagiert werden (Klick drauf) und damit Aktionen auf Server Seite auslösen.
+  Oder auch eine Pfadangabe für ein alternatives Icon welchen beim Tooltip verwendet wird.
