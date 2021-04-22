@@ -1,7 +1,18 @@
 require('dotenv').config();
 const io = require("socket.io-client");
 const win = require("./win");
-const socket = io.connect(`ws://${process.env.SERVER_IP ?? "localhost"}:${process.env.SERVER_PORT ?? 8588}` );
+const DEFAULT_PORT = 8588;
+
+if(!process.env.SERVER_IP)
+{
+    console.error(`Bitte legen Sie einen Wert für die Umgebungsvariable SERVER_IP in der .env Datei fest! (Siehe Github Readme)`);
+    process.exit(1);
+}
+
+if(!process.env.SERVER_PORT)
+    console.warn(`Falls Sie keinen Wert für die Umgebungsvariable SERVER_PORT in der .env Datei festlegen (Siehe Github Readme) wird standardmäßig ${DEFAULT_PORT} verwendet.`);
+    
+const socket = io.connect(`ws://${process.env.SERVER_IP}:${process.env.SERVER_PORT ?? DEFAULT_PORT}`);
 
 
 socket.on('connect', () => {

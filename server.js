@@ -1,12 +1,21 @@
 "use strict";
-// Für socket io muss "socket.io" in der Javascript Instanz als Modul hinzugefügt werden
-const server = require('socket.io')();
+
+// Der Port der für die Verbindung genutzt wird
+const PORT = 8588;
 
 // Unter dem folgenden Ordner werden die notwendigen Datenpunkte angelegt
-const idRootFolder = '0_userdata.0.Datenpunkte.Funktion.WindowsControlNode';
+const INSTALL_FOLDER = '0_userdata.0.Datenpunkte.Funktion'; 
+
+
+/**
+ * Ab hier nichts veränder außer du weißt was du tust
+ */
+
+const server = require('socket.io')();
 
 const DEBUG = false;
 
+const idRootFolder = `${INSTALL_FOLDER}.WindowsControl-Socket`;
 class Client
 {
     constructor(socket)
@@ -17,7 +26,7 @@ class Client
             infos: {
                 architecture: this.newObj(),
                 connected: this.newObj({ typ: 'boolean'}),
-                distro: this.newObj(),
+                distri: this.newObj(),
                 hostname: this.newObj(),
             },
             notification: this.newObj({write: true}),
@@ -141,11 +150,11 @@ class Client
         try {
             if(!folder || folder.length === 0 || !this.client || !this.client.infos) return;
             const folderInfo = `${folder}.${this.getIpName}.Info`;
-            const {architecture,connected,distro,hostname} = this.client.infos;
+            const {architecture,connected,distri,hostname} = this.client.infos;
     
             await architecture.setDp(`${folderInfo}.Architecture`);
             await connected.setDp(`${folderInfo}.Connected`);
-            await distro.setDp(`${folderInfo}.Distro`);
+            await distri.setDp(`${folderInfo}.distri`);
             await hostname.setDp(`${folderInfo}.Hostname`);
 
             
@@ -206,13 +215,13 @@ class Client
             Debug(`Get infos`)
             const infos = await this.getSysteminfo();
             const {
-                distro // z.B. Windows 10
+                distri // z.B. Windows 10
                 ,arch // z.B. 64 bit
                 ,hostname // Rechnername
             } = infos;
     
-            if(distro)
-                this.client.infos.distro.set = distro;
+            if(distri)
+                this.client.infos.distri.set = distri;
 
             if(arch)
                 this.client.infos.architecture.set = arch;
@@ -562,7 +571,7 @@ try{
     /**
      * Start Server
      */
-    server.listen(8588);
+    server.listen(PORT);
     Info('Listening on port 8588');
 } catch(err){
     clean();
