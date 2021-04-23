@@ -7,29 +7,37 @@ Momentan kann primär der Server Befehle an den Client senden und auch Antworten
 
 ## Mögliche Befehle vom Server an den Client
 1. Notification (Benachrichtigung)
+
   Hierbei wird dem Client die Nachricht auf dem Datenpunkt geschickt und er zeigt diese als TrayIcon-Tooltip an
 
 2. Powershell
+
   Hierbei wird dem Client der Text aus dem Datenpunkt geschickt und er führt dieses direkt aus, also vorsichtig mit sein!
 
 3. Shutdown (Herunterfahren)
+
   Herunterfahren Befehl an den Client
   
 4. Restart (Neustart)
+
   Neustart Befehl an den Client
   
  
 ## Informationen die der Server vom Client erhält
 1. Connected (Verbunden)
+
   Zeigt an ob der Client mit dem Server verbunden ist
 
 2. Architecture (Architektur)
+
   Zeigt die Client Architektur an z.B. x64 für 64-Bit
 
 3. Distribution
+
    Zeigt die Client Distribution an z.B. Windows 10
 
 4. Hostname (Computer-Name)
+
   Zeigt den Client Hostnamen an
 
 ## Konfiguration
@@ -53,8 +61,12 @@ npm i
 2. Global installiertes NodeJs Modul pm2. (`npm install -g pm2`)
 3. Im Projektverzeichnis (Verzeichnis wo die client.js liegt) eine .env anlegen und mit den notwendigen Variablen füllen (siehe unten)
 4. Angepasste AutoStartMitPm2.bat in den Autostart
-  i. Bitte den Pfad in der 3 Zeile anpassen, hier muss der Ordner zu diesem Projekt drin stehen
-  ii. Der Autostartordner lässt sich leicht öffnen, indem man die Windowsanwendung "Ausführen" öffnet und hier "shell:startup" einträgt.
+
+AutoStartMitPm2:
+
+  Bitte den Pfad in der 3 Zeile anpassen, hier muss der Ordner zu diesem Projekt drin stehen
+  Das Laufwerk in dem sich der Pfad befindet in Zeile 2
+  Der Autostartordner lässt sich leicht öffnen, indem man die Windowsanwendung "Ausführen" öffnet und hier "shell:startup" einträgt.
 
 
 Um die NodeJs Anwendung auf einem Windowssystem zu starten nutze ich NodeJs v14.16.1 und setze die AutoStartMitPm2.bat in den Autostart Ordner von Windows.
@@ -84,5 +96,6 @@ SERVER_IP=192.168.2.10
 ## Ideen für weitere Funktionen
 1. Besseres Logging Clientseite (auch mit Logdateien)
 2. Erweiterte Benachrichtigungen
+
   Hierbei könnte laut dem verwendeten NodeJs Modul auch mit dem Tooltip interagiert werden (Klick drauf) und damit Aktionen auf Server Seite auslösen.
   Oder auch eine Pfadangabe für ein alternatives Icon welchen beim Tooltip verwendet wird.
