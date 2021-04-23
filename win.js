@@ -11,7 +11,8 @@ function executePowershell(cmd){
     console.log(`Execute Powershell command:\n${cmd}`);
     const ps = new Shell({
         executionPolicy: 'Bypass',
-        noProfile: true
+        noProfile: true,
+        windowstyle:'hidden'
       });
       
       ps.addCommand(cmd);
