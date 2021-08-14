@@ -1,5 +1,8 @@
 "use strict";
 
+/**
+ * https://github.com/xCruziX/iobroker.WindowsControl-Socket/blob/master/server.js
+*/
 // Der Port der für die Verbindung genutzt wird
 const PORT = 8588;
 
@@ -25,7 +28,7 @@ class Client
         this.client = {
             infos: {
                 architecture: this.newObj(),
-                connected: this.newObj({ typ: 'boolean'}),
+                connected: this.newObj({ log:true, typ: 'boolean'}),
                 distribution: this.newObj(),
                 hostname: this.newObj(),
             },
@@ -47,10 +50,11 @@ class Client
         Info(`Connected with client ${this.getIp} - ${this.client.infos.hostname.get}`);
     }
 
-    newObj({value,typ,dp, ip, write, role} = {})
+    newObj({value,typ,dp, ip, write, role, log} = {})
     {
         const internIP = this.getIp;
         const createUserState = this.createUserState;
+        
         /**
          * Typ:
          * 1 => Function
@@ -64,7 +68,7 @@ class Client
                 if(!this.getDp()) return;
                 if(await existsObjectAsync(this.getDp()))
                 {
-                    await setStateAsync(this.getDp(),v);
+                    await setStateAsync(this.getDp(),v, true);
                     Debug(`State ${this.getDp()} changed to ${v}`);
                 }
                 else
@@ -101,7 +105,9 @@ class Client
             },
             getDpArrayFromTyp()
             {
-                const obj = {'name': '','typ':typ || 'string', write: write || false, ip: this.ip, role: role || ''};
+                if (log) console.log('typ: ' + typ);
+                const tmpTyp = typ ?? 'string';
+                const obj = {'name': '','type': tmpTyp, write: write || false, ip: this.ip, role: role || ''};
                 switch(this.typ)
                 {
                     case 'boolean':
@@ -214,6 +220,14 @@ class Client
         try {
             Debug(`Get infos`)
             const infos = await this.getSysteminfo();
+            if(!infos)
+            {
+                Error(`Cant get system info`);
+                return;
+            }
+
+            Debug(JSON.stringify(infos))
+
             // Destructure the information coming from client
             const {
                 distro // z.B. Windows 10
@@ -247,7 +261,7 @@ class Client
     async stop(reason)
     {
         if(!this.socket.get) return;
-        await promiseEmit(`discn`,reason);
+        await this.promiseEmit(`discn`,reason);
     }
 
 
@@ -560,7 +574,7 @@ try{
     // Reset States
     Debug(`Reset all states`);
     let selector = $(`[id=${idRootFolder}*Info*Connected]`);
-    selector.each(async (id, i) => await setStateAsync(id, false));
+    selector.each(async (id, i) => await setStateAsync(id, false, true));
 
     server.on('connection',async (socket) => {
         const client = await clientList.addClient(socket);
