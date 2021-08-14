@@ -105,7 +105,6 @@ class Client
             },
             getDpArrayFromTyp()
             {
-                if (log) console.log('typ: ' + typ);
                 const tmpTyp = typ ?? 'string';
                 const obj = {'name': '','type': tmpTyp, write: write || false, ip: this.ip, role: role || ''};
                 switch(this.typ)
