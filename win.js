@@ -32,7 +32,18 @@ function winRestart(){
 
 async function getSystemInfos(){
     console.log(`Get system infos`);
-    return await si.osInfo();
+    let valueObject = {
+		time: 'uptime',
+		cpu: 'manufacturer, brand',
+		cpuTemperature: 'main',
+		osInfo: 'platform, distro, arch, hostname',
+		system: 'model, manufacturer',
+		users: '*',
+		currentLoad: 'avgLoad, currentLoad, currentLoadUser, currentLoadSystem',
+		battery: 'hasBattery, isCharging, acConnected, percent'
+	}
+    //return await si.osInfo();
+	return await si.get(valueObject);
 }
 
 function startNotifyService()
